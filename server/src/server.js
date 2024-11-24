@@ -20,17 +20,17 @@ app.use(
     })
   );
 
-app.use('/api/v1/auth',authRoutes)
-app.use("/api/v1/messages", messageRoutes);
+app.use('/api/auth',authRoutes)
+app.use("/api/messages", messageRoutes);
 
 
 const PORT = process.env.PORT
-// let __dirname = path.resolve()
+const __dirname = path.resolve()
 
 if(process.env.NODE_ENV = 'production'){
-  app.use(express.static(path.join(__dirname,"./client/dist")))
+  app.use(express.static(path.join(__dirname,"../client/dist")))
   app.get("*",(req,res)=>{
-      res.sendFile(path.join(__dirname,"./client","dist","index.html"))
+      res.sendFile(path.join(__dirname,"../client","dist","index.html"))
   })
 }
 
