@@ -1,41 +1,42 @@
-const express = require('express')
-const dotenv = require('dotenv')
-const authRoutes =  require('./routes/auth.routes'); 
-const messageRoutes = require('./routes/message.routes')
-const connectToDb = require('./lib/db')
-const cookieParser = require('cookie-parser');
-const cors = require('cors')
-const{server,app} = require('./lib/socket')
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
-const path = require('path')
+import path from "path";
 
-dotenv.config()
-app.use(express.json())
-app.use(cookieParser())
+import { connectDB } from "./lib/db.js";
+
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
+import { app, server } from "./lib/socket.js";
+
+dotenv.config();
+
+const PORT = process.env.PORT;
+const __dirname = path.resolve();
+
+app.use(express.json());
+app.use(cookieParser());
 app.use(
-    cors({
-      origin: "http://localhost:5173",
-      credentials: true,
-      methods:['GET','POST','PUT','UPDATE','DELETE']
-    })
-  );
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-app.use('/api/auth',authRoutes)
+app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-const PORT = process.env.PORT
-const __dirname = path.resolve()
-
-if(process.env.NODE_ENV = 'production'){
-  app.use(express.static(path.join(__dirname,"../client/dist")))
-  app.get("*",(req,res)=>{
-      res.sendFile(path.join(__dirname,"../client","dist","index.html"))
-  })
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
 }
 
-
-server.listen(PORT,()=>{
-    console.log(`server is live at port ${PORT}`)
-    connectToDb();
-})
+server.listen(PORT, () => {
+  console.log("server is running on PORT:" + PORT);
+  connectDB();
+});
